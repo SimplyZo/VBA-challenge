@@ -1,0 +1,126 @@
+Sub StockMarket()
+
+'Declare and set worksheet
+Dim ws As Worksheet
+
+'Loop through stocks for one year period
+For Each ws In Worksheets
+
+'Print the column headings
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly Change"
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+ws.Cells(1, 16).Value = "Ticker"
+ws.Cells(1, 17).Value = "Value"
+ws.Cells(2, 15).Value = "Greatest % Increase"
+ws.Cells(3, 15).Value = "Greatest % Decrease"
+ws.Cells(4, 15).Value = "Greatest Total Volume"
+
+'Define the Variables
+Dim Ticker As String
+Ticker = " "
+Dim Ticker_volume As Long
+Ticker_volume = 0
+Dim stock_volume As Long
+stock_volume = 0
+Dim OpenPrice As Double
+OpenPrice = 0
+Dim ClosePrice As Double
+ClosePrice = 0
+Dim YearlyChange As Double
+YearlyChange = 0
+Dim PriceChangePercent As Double
+PriceChangePercent = 0
+Dim start As Double
+start = 2
+Dim increaseTicker As String
+Dim greatestIncrease As Double
+Dim decreaseTicker As String
+Dim greatestDecrease As Double
+greatestIncrease = 0
+greatestDecrease = 0
+greatestTotalvolume = 0
+
+'Set the last row for the worksheet
+Dim Lastrow As Long
+Lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+'Loop through all tickers of the worksheet to LastRow
+SummaryRow = 2
+For I = 2 To Lastrow
+
+TotalVolume = TotalVolume + ws.Cells(I, 7).Value
+
+'Conditional check output for ticker symbol
+If ws.Cells(I + 1, 1).Value <> ws.Cells(I, 1).Value Then
+
+'Set the Ticker name and value
+Ticker = ws.Cells(I, 1).Value
+
+ws.Cells(SummaryRow, 12).Value = TotalVolume
+
+'Establish Open Price and Close Price Values
+OpenPrice = ws.Cells(start, 3).Value
+ClosePrice = ws.Cells(I, 6).Value
+start = I + 1
+
+'Yearly Change Calculation & Percent Change Calculations
+YearlyChange = ClosePrice - OpenPrice
+If OpenPrice <> 0 Then
+PercentChange = (YearlyChange / OpenPrice)
+End If
+
+'if statements for % change in Greatest Increase/Decrease and total volume
+If PercentChange > greatestIncrease Then
+greatestincreaseTicker = Ticker
+greatestIncrease = PercentChange
+End If
+
+If PercentChange < greatestDecrease Then
+greatestdecreaseTicker = Ticker
+greatestDecrease = PercentChange
+End If
+
+If TotalVolume > greatestTotalvolume Then
+greatestVolumeTicker = Ticker
+greatestTotalvolume = TotalVolume
+End If
+               
+'Create object ranges for respective columns
+ws.Cells(SummaryRow, 9).Value = Ticker
+ws.Cells(SummaryRow, 10).Value = YearlyChange
+ws.Cells(SummaryRow, 11).Value = PercentChange
+ws.Cells(SummaryRow, 11).NumberFormat = "0.00%"
+
+'Color codes for positive and negative yearly changes respectively
+If YearlyChange > 0 Then
+ws.Cells(SummaryRow, 10).Interior.ColorIndex = 4
+
+ElseIf YearlyChange < 0 Then
+ws.Cells(SummaryRow, 10).Interior.ColorIndex = 3
+               
+End If
+
+TotalVolume = 0
+SummaryRow = SummaryRow + 1
+
+End If
+
+Next I
+
+'Place Increase ticker, Decrease ticker and Greatest volume tikcer into ranges & Greatest Increase, Decrease and Volume Values
+ws.Range("P2").Value = greatestincreaseTicker
+ws.Range("P3").Value = greatestdecreaseTicker
+ws.Range("P4").Value = greatestVolumeTicker
+ws.Range("Q2").Value = greatestIncrease
+ws.Range("Q3").Value = greatestDecrease
+ws.Range("Q4").Value = greatestTotalvolume
+ws.Range("Q2").NumberFormat = "0.00%"
+ws.Range("Q3").NumberFormat = "0.00%"
+
+Next ws
+
+End Sub
+
+
